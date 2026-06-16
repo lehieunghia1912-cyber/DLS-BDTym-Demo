@@ -1,0 +1,26 @@
+# Secrets — NEVER include in Docker image
+.env
+.greennode.json
+.agentbase/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Dev/test files
+test_agent.py
+*.test.py
+
+# Git
+.git/
+.gitignore
+
+# Registry credentials
+registry-credentials.json
+*.credentials.json
