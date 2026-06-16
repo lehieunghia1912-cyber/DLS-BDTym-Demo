@@ -1,6 +1,6 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────────
-# ZaloPay BD Agent — Deployment Verification Script
+# Zalopay BD Agent — Deployment Verification Script
 # Chạy: bash verify_deployment.sh
 # ─────────────────────────────────────────────────────────────────
 
@@ -39,9 +39,9 @@ STATUS=$(curl -s -o /tmp/zp_body.txt -w "%{http_code}" --max-time 10 "${ENDPOINT
 BODY=$(cat /tmp/zp_body.txt)
 check "GET /" "$STATUS" "200" "$BODY"
 
-# ── Test 3: Chat — Turn 1 (QR ZaloPay) ───────────────────────
-echo -e "\n${BOLD}[3/4] Chat Test — Hỏi về QR ZaloPay${RESET}"
-STATUS=$(curl -s -o /tmp/zp_body.txt -w "%{http_code}" --max-time 20   -X POST "${ENDPOINT}/chat"   -H "Content-Type: application/json"   -d '{"message":"Chào anh, tôi đang quản lý chuỗi 15 cửa hàng thời trang. Quy trình tích hợp QR ZaloPay mất bao lâu và cần chuẩn bị gì?","session_id":"verify-001"}')
+# ── Test 3: Chat — Turn 1 (QR Zalopay) ───────────────────────
+echo -e "\n${BOLD}[3/4] Chat Test — Hỏi về QR Zalopay${RESET}"
+STATUS=$(curl -s -o /tmp/zp_body.txt -w "%{http_code}" --max-time 20   -X POST "${ENDPOINT}/chat"   -H "Content-Type: application/json"   -d '{"message":"Chào anh, tôi đang quản lý chuỗi 15 cửa hàng thời trang. Quy trình tích hợp QR Zalopay mất bao lâu và cần chuẩn bị gì?","session_id":"verify-001"}')
 BODY=$(cat /tmp/zp_body.txt)
 check "POST /chat (Turn 1)" "$STATUS" "200" "$BODY"
 

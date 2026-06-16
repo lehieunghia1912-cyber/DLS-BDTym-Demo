@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ZaloPay BD Agent — HTTP Server (AgentBase Runtime)
+Zalopay BD Agent — HTTP Server (AgentBase Runtime)
 Expose:
   GET  /health        → 200 OK  (AgentBase health check)
   POST /chat          → {"message": "..."} → {"reply": "..."}

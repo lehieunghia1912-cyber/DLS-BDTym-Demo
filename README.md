@@ -1,6 +1,6 @@
-# ZaloPay BD Agent
+# Zalopay BD Agent
 
-Trợ lý Phát triển Kinh doanh ZaloPay — deployed trên GreenNode AgentBase Runtime.
+Trợ lý Phát triển Kinh doanh Zalopay — deployed trên GreenNode AgentBase Runtime.
 
 ## Endpoint Production
 
@@ -11,7 +11,7 @@ https://endpoint-b1a92c63-92e9-4420-9bf0-3aea94356a56.agentbase-runtime.aiplatfo
 ## Cấu trúc dự án
 
 ```
-ZaloPay-BD-Agent/
+Zalopay-BD-Agent/
 ├── agent.py               # HTTP server chính (port 8080, /health, /chat)
 ├── main.py                # CLI interactive (chạy local)
 ├── config.py              # Role/Persona, System Prompt, biểu phí
@@ -29,14 +29,14 @@ ZaloPay-BD-Agent/
 ### Health check
 ```bash
 curl https://endpoint-b1a92c63-92e9-4420-9bf0-3aea94356a56.agentbase-runtime.aiplatform.vngcloud.vn/health
-# → {"status": "ok", "agent": "ZaloPay BD Assistant"}
+# → {"status": "ok", "agent": "Zalopay BD Assistant"}
 ```
 
 ### Chat
 ```bash
 curl -X POST https://endpoint-b1a92c63-92e9-4420-9bf0-3aea94356a56.agentbase-runtime.aiplatform.vngcloud.vn/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "Quy trình tích hợp QR ZaloPay mất bao lâu?", "session_id": "user-123"}'
+  -d '{"message": "Quy trình tích hợp QR Zalopay mất bao lâu?", "session_id": "user-123"}'
 # → {"reply": "...", "session_id": "user-123"}
 ```
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Minimal static file server for ZaloPay BD Agent web UI.
+Minimal static file server for Zalopay BD Agent web UI.
 Serves index.html and responds to /health for AgentBase Runtime.
 """
 
@@ -48,5 +48,5 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", PORT), Handler)
-    print(f"[ZaloPay BD UI] Listening on 0.0.0.0:{PORT}")
+    print(f"[Zalopay BD UI] Listening on 0.0.0.0:{PORT}")
     server.serve_forever()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ZaloPay BD Agent — Automated Test
-Kịch bản: Chủ chuỗi cửa hàng bán lẻ hỏi về QR ZaloPay và tối ưu phí.
+Zalopay BD Agent — Automated Test
+Kịch bản: Chủ chuỗi cửa hàng bán lẻ hỏi về QR Zalopay và tối ưu phí.
 Chạy: python test_agent.py
 """
 
@@ -33,7 +33,7 @@ TEST_SCENARIO = [
         "label": "Turn 1 — Giới thiệu & nhu cầu",
         "message": (
             "Chào anh, tôi đang quản lý chuỗi 15 cửa hàng thời trang tại TP.HCM và Hà Nội, "
-            "doanh thu mỗi tháng khoảng 5 tỷ. Tôi muốn tìm hiểu về giải pháp QR ZaloPay, "
+            "doanh thu mỗi tháng khoảng 5 tỷ. Tôi muốn tìm hiểu về giải pháp QR Zalopay, "
             "không biết quy trình tích hợp như thế nào và mất bao lâu?"
         ),
     },
@@ -42,14 +42,14 @@ TEST_SCENARIO = [
         "message": (
             "Anh có thể cho tôi biết biểu phí cụ thể không? "
             "Hiện tại bên tôi đang dùng một cổng khác với mức phí 1.3% cho QR. "
-            "ZaloPay có thể cạnh tranh được không?"
+            "Zalopay có thể cạnh tranh được không?"
         ),
     },
     {
         "label": "Turn 3 — Hỏi tối ưu dòng tiền & BNPL",
         "message": (
             "Ngoài QR, tôi cũng đang nghĩ đến việc tích hợp trả góp cho khách mua hàng "
-            "giá trị cao trên 3 triệu. ZaloPay có giải pháp nào giúp tôi tăng giá trị đơn hàng "
+            "giá trị cao trên 3 triệu. Zalopay có giải pháp nào giúp tôi tăng giá trị đơn hàng "
             "mà không làm phức tạp quy trình thanh toán không?"
         ),
     },

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ZaloPay BD Agent — Interactive CLI
+Zalopay BD Agent — Interactive CLI
 Chạy: python main.py
 Yêu cầu: ANTHROPIC_API_KEY trong môi trường hoặc file .env
 """
@@ -58,14 +58,14 @@ def run_interactive():
     history: list[dict] = []
 
     print_banner()
-    print(f"{Color.GREEN}[{AGENT_NAME}] Xin chào! Tôi là Minh Tuấn từ đội BD ZaloPay. "
+    print(f"{Color.GREEN}[{AGENT_NAME}] Xin chào! Tôi là Hiếu Nghĩa từ đội BD Zalopay. "
           f"Anh/chị cần tư vấn về giải pháp thanh toán nào hôm nay ạ?{Color.RESET}\n")
 
     while True:
         try:
             user_input = input(f"{Color.BLUE}[Merchant] {Color.RESET}").strip()
         except (EOFError, KeyboardInterrupt):
-            print(f"\n{Color.YELLOW}Cảm ơn anh/chị đã quan tâm đến ZaloPay. Hẹn gặp lại!{Color.RESET}")
+            print(f"\n{Color.YELLOW}Cảm ơn anh/chị đã quan tâm đến Zalopay. Hẹn gặp lại!{Color.RESET}")
             break
 
         if not user_input:
