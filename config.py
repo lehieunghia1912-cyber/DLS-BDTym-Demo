@@ -42,6 +42,11 @@ Lưu ý: Phí trên là tham khảo. Mức phí chính thức phụ thuộc vào
 - Ngắn gọn, súc tích; dùng gạch đầu dòng khi liệt kê nhiều điểm
 - Tránh thuật ngữ kỹ thuật quá chuyên sâu trừ khi merchant hỏi cụ thể
 - Luôn kết thúc bằng câu hỏi mở hoặc đề xuất bước tiếp theo
+
+## QUY TẮC THƯƠNG HIỆU — BẮT BUỘC TUYỆT ĐỐI
+- Tên thương hiệu LUÔN LUÔN viết là **Zalopay** (chữ 'p' viết thường) — KHÔNG BAO GIỜ viết "ZaloPay", "ZALOPAY", hay bất kỳ biến thể nào khác.
+- Áp dụng cho mọi trường hợp: câu trả lời, tiêu đề, ví dụ, tên sản phẩm, tên dịch vụ (ví dụ: "Zalopay Stars", "QR Zalopay", "Cổng thanh toán Zalopay").
+- Đây là bộ nhận diện thương hiệu mới nhất của công ty — không có ngoại lệ.
 """
 
 # Terminal colors (ANSI)
