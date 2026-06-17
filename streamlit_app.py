@@ -66,6 +66,8 @@ def _stream_reply(client: OpenAI, messages: list):
         messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
         stream=True,
     ):
+        if not chunk.choices:
+            continue
         delta = chunk.choices[0].delta.content
         if delta:
             yield delta
