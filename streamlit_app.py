@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""Zalopay BD Agent — Streamlit Chat UI"""
+"""Zalopay BD Agent — Streamlit Chat UI with chart rendering"""
+import json
 import os
+import re
+
+import plotly.graph_objects as go
 import streamlit as st
 from openai import OpenAI
-from config import MODEL, MAX_TOKENS, SYSTEM_PROMPT
+
+from config import MAX_TOKENS, MODEL, SYSTEM_PROMPT
 
 # ─── Page config ─────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -12,13 +17,12 @@ st.set_page_config(
     layout="centered",
 )
 
-# ─── CSS injection ────────────────────────────────────────────────────────────
+# ─── CSS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
   [data-testid="stAppViewContainer"] > .main { background: #f0f2f5; }
   [data-testid="stHeader"] { display: none; }
   footer { visibility: hidden; }
-  /* Suggestion chip buttons */
   div[data-testid="stHorizontalBlock"] button {
     border: 1px solid #0068FF !important;
     color: #0068FF !important;
@@ -29,15 +33,17 @@ st.markdown("""
   div[data-testid="stHorizontalBlock"] button:hover {
     background: #e8f0ff !important;
   }
-  /* New-chat button style */
-  [data-testid="stMainBlockContainer"] > div:first-child button[kind="secondary"] {
-    border-radius: 20px !important;
-  }
 </style>
 """, unsafe_allow_html=True)
 
+# Zalopay palette
+_BLUE    = "#0068FF"
+_GREY    = "#94a3b8"
+_PALETTE = ["#0068FF", "#3385FF", "#FF6B35", "#F59E0B",
+            "#10B981", "#8B5CF6", "#94a3b8", "#cbd5e1"]
 
-# ─── Env + OpenAI client ─────────────────────────────────────────────────────
+
+# ─── Env + client ─────────────────────────────────────────────────────────────
 def _load_env():
     path = os.path.join(os.path.dirname(__file__), ".env")
     if os.path.exists(path):
@@ -59,7 +65,6 @@ def _build_client() -> OpenAI:
 
 
 def _stream_reply(client: OpenAI, messages: list):
-    """Yield token strings from the LLM stream."""
     for chunk in client.chat.completions.create(
         model=MODEL,
         max_tokens=MAX_TOKENS,
@@ -73,6 +78,107 @@ def _stream_reply(client: OpenAI, messages: list):
             yield delta
 
 
+# ─── Chart rendering ──────────────────────────────────────────────────────────
+def _colors(labels: list, highlight: str = "") -> list:
+    if highlight:
+        return [_BLUE if highlight.lower() in lbl.lower() else _GREY for lbl in labels]
+    return _PALETTE[: len(labels)]
+
+
+def render_chart(data: dict):
+    ctype     = data.get("type", "bar")
+    title     = data.get("title", "")
+    highlight = data.get("highlight", "Zalopay")
+
+    if ctype == "bar":
+        labels = data.get("labels", [])
+        values = data.get("values", [])
+        unit   = data.get("unit", "")
+        colors = _colors(labels, highlight)
+        fig = go.Figure(go.Bar(
+            x=labels, y=values,
+            marker_color=colors,
+            text=[f"{v}{unit}" for v in values],
+            textposition="outside",
+        ))
+        fig.update_layout(
+            title=title, plot_bgcolor="white", paper_bgcolor="white",
+            showlegend=False, margin=dict(t=50, b=20, l=20, r=20),
+            yaxis=dict(showgrid=True, gridcolor="#eee"),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    elif ctype == "pie":
+        labels = data.get("labels", [])
+        values = data.get("values", [])
+        pull   = [0.08 if "zalopay" in lbl.lower() else 0 for lbl in labels]
+        fig = go.Figure(go.Pie(
+            labels=labels, values=values,
+            marker_colors=_PALETTE[: len(labels)],
+            pull=pull, textinfo="label+percent",
+            hole=0.3,
+        ))
+        fig.update_layout(
+            title=title, paper_bgcolor="white",
+            margin=dict(t=50, b=20, l=20, r=20),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    elif ctype == "line":
+        x_labels = data.get("labels", [])
+        series   = data.get("series", [])
+        fig = go.Figure()
+        for i, s in enumerate(series):
+            is_zp = "zalopay" in s.get("name", "").lower()
+            fig.add_trace(go.Scatter(
+                x=x_labels, y=s.get("values", []),
+                name=s.get("name", ""),
+                mode="lines+markers",
+                line=dict(
+                    color=_BLUE if is_zp else _PALETTE[i % len(_PALETTE)],
+                    width=3 if is_zp else 2,
+                ),
+                marker=dict(size=7 if is_zp else 5),
+            ))
+        fig.update_layout(
+            title=title, plot_bgcolor="white", paper_bgcolor="white",
+            margin=dict(t=50, b=20, l=20, r=20),
+            yaxis=dict(showgrid=True, gridcolor="#eee"),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    elif ctype == "table":
+        headers = data.get("headers", [])
+        rows    = data.get("rows", [])
+        if title:
+            st.markdown(f"**{title}**")
+        md  = "| " + " | ".join(headers) + " |\n"
+        md += "| " + " | ".join(["---"] * len(headers)) + " |\n"
+        md += "\n".join("| " + " | ".join(str(c) for c in row) + " |" for row in rows)
+        st.markdown(md)
+
+    else:
+        st.warning(f"Loại biểu đồ không hỗ trợ: `{ctype}`")
+
+
+_CHART_RE = re.compile(r"```chart\s*\n(.*?)\n```", re.DOTALL)
+
+
+def render_message(content: str):
+    """Render message: replace ```chart blocks with actual Plotly charts."""
+    parts = _CHART_RE.split(content)
+    for i, part in enumerate(parts):
+        if i % 2 == 0:         # text segment
+            if part.strip():
+                st.markdown(part)
+        else:                  # JSON chart segment
+            try:
+                render_chart(json.loads(part.strip()))
+            except Exception as exc:
+                st.warning(f"Không thể hiển thị biểu đồ: {exc}")
+                st.code(part, language="json")
+
+
 # ─── Session state ────────────────────────────────────────────────────────────
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -80,17 +186,24 @@ if "messages" not in st.session_state:
 client = _build_client()
 
 
-# ─── Core send handler ────────────────────────────────────────────────────────
+# ─── Send handler ─────────────────────────────────────────────────────────────
 def handle_send(user_text: str):
     st.session_state.messages.append({"role": "user", "content": user_text})
     with st.chat_message("user"):
         st.markdown(user_text)
     with st.chat_message("assistant"):
+        placeholder = st.empty()
+        full_text = ""
         try:
-            reply = st.write_stream(_stream_reply(client, st.session_state.messages))
+            for token in _stream_reply(client, st.session_state.messages):
+                full_text += token
+                placeholder.markdown(full_text + "▌")
+            placeholder.empty()
+            render_message(full_text)
+            reply = full_text
         except Exception as exc:
             reply = f"⚠️ Lỗi kết nối API: {exc}"
-            st.error(reply)
+            placeholder.error(reply)
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.rerun()
 
@@ -99,11 +212,9 @@ def handle_send(user_text: str):
 h_col, btn_col = st.columns([7, 1])
 with h_col:
     st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, #0068FF, #0054CC);
-        color: white; padding: 14px 18px; border-radius: 12px;
-        margin-bottom: 6px; line-height: 1.55;
-    ">
+    <div style="background:linear-gradient(135deg,#0068FF,#0054CC);
+        color:white;padding:14px 18px;border-radius:12px;
+        margin-bottom:6px;line-height:1.55;">
         <b style="font-size:15px;">💙 Hiếu Nghĩa — Zalopay BD</b><br>
         <span style="font-size:12px;opacity:.88;">
             Chuyên viên Phát triển Kinh doanh &nbsp;·&nbsp;
@@ -124,18 +235,19 @@ WELCOME = (
     "giải pháp thanh toán gì ạ?"
 )
 SUGGESTIONS = [
-    "Tích hợp QR thanh toán",
-    "Phí cổng thanh toán",
+    "So sánh MDR các giải pháp thanh toán",
+    "Thị phần ví điện tử Việt Nam",
     "BNPL mua trước trả sau",
     "Quy trình onboarding merchant",
 ]
 
-# Replay conversation history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+        if msg["role"] == "assistant":
+            render_message(msg["content"])
+        else:
+            st.markdown(msg["content"])
 
-# Empty-state: welcome + suggestion chips
 if not st.session_state.messages:
     with st.chat_message("assistant"):
         st.markdown(WELCOME)
