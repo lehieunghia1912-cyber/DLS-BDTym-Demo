@@ -19,9 +19,9 @@ COPY . .
 # AgentBase Runtime requires port 8080
 EXPOSE 8080
 
-# Health check expected by AgentBase Runtime
-HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" || exit 1
+# Health check via Streamlit's built-in endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/_stcore/health')" || exit 1
 
-# Run the HTTP server (agent.py wraps the BD logic as a REST API)
-CMD ["python", "agent.py"]
+# Run Streamlit app (port 8080 set in .streamlit/config.toml)
+CMD ["streamlit", "run", "streamlit_app.py"]
